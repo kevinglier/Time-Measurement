@@ -9,12 +9,21 @@ h1 {
     text-align: center;
 }
 
-.countdown-timer {
-
-}
-
 .countdown-timer-display {
     font-size: 8em;
+    text-align: center;
+}
+	.countdown-timer-display input {
+    border: none;
+		padding: none;
+		display: inline;
+		width: auto;
+	}
+
+	
+
+
+.countdown-timer-options {
     text-align: center;
 }
 
@@ -59,4 +68,14 @@ h1 {
     font-size: 2em;
     width:30%;
     float:left;
+}
+
+.countdown-timer-options {
+	margin-top: 15px;
+}
+
+.note-options {
+	overflow-x:auto;
+	overflow-y:hidden;
+	white-space: nowrap;
 }

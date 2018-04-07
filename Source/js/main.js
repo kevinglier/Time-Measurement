@@ -1,13 +1,70 @@
+var TIME_UNITS = [ // "value" in seconds
+	{ key: 'pomodoro', caption: 'Pomodoro', value: 25 * 60 },
+	{ key: 'hours', caption: 'Hours', value: 60 * 60 },
+	{ key: 'any', caption: 'Any', value: null }
+];
+
+var RUNNING_STATE_RUNS = 1;
+var RUNNING_STATE_PAUSED = 2;
+var RUNNING_STATE_STOPPED = 3;
+
+function Note() {
+	
+	this.text = '';
+	this.time = new Date();// Date
+	this.duration = 4; // seconds
+	
+	this.getTextFormatted = function() { return this.text; };
+	this.getTimeFormatted = function() { return this.time.toLocaleTimeString(); };
+	this.getDurationFormatted = function() {
+		var h = parseInt(this.duration / 60);
+		var m = (this.duration % 60);
+		return (h ? h : 'h') + m + 'm';
+	};
+}
+
 var ViewModel = function (durationInMinutes) {
     "use strict";
     var self = {};
 
-    self.startValue = durationInMinutes * 60; 
+		self.runningState = ko.observable(RUNNING_STATE_STOPPED);
 
-    self.remainingSeconds = ko.observable(self.startValue);
-    self.running = ko.observable(false);
-    self.totalPomodorosToday = ko.observable(0);
+    self.startValue = durationInMinutes * 60;
+		
+		self.timeUnits = TIME_UNITS;
+		self.timeUnitsDisabled = ko.computed(function () { return self.runningState() != RUNNING_STATE_STOPPED; });
+		self.timerTimeUnit = ko.observable(TIME_UNITS[0]);
+		
+		self.timerTimeUnit.subscribe(function() {
+        self.startValue = TIME_UNITS.find(x => x.key == self.timerTimeUnit()).value || 15 * 60;
+				
+				self.resetClick();
+    });
+		
+		self.totalTodayTimeUnits = TIME_UNITS.slice(0, TIME_UNITS.length - 1); 
+    self.totalToday = ko.observable(0); // In seconds
+		self.totalTodayUnit = ko.observable(TIME_UNITS[0]);
+		self.totalTodayUnitChanged = function() {
+			recalculateTotalToday();
+		};
+		function recalculateTotalToday() {
+			var unit = self.totalTodayUnit() || self.totalTodayTimeUnits[0] || null;
+			if (unit) {
+				var total = self.totalToday() / 60;
+				self.totalToday(total / self.totalTodayUnit());
+			}
+			self.totalToday(0);
+		}
+		
+		
+		
+		self.remainingSeconds = ko.observable(self.startValue);
+   
+		
     self.noteText = ko.observable("");
+		
+		self.notes = ko.observableArray([]); // Array of Notes
+
 
     self.remainingTime = ko.computed(function () {
         var remainingSeconds = parseInt(ko.unwrap(self.remainingSeconds), 10);
@@ -15,31 +72,24 @@ var ViewModel = function (durationInMinutes) {
         var seconds = remainingSeconds % 60;
 
         var minutesString = minutes.toString();
+				minutesString = minutesString.length === 1 ? "0" + minutesString : minutesString;
         var secondsString = seconds.toString();
-
-        var display = "";
-        if (minutesString.length === 1) display += "0";
-        display += minutesString;
-        display += ":";
-        if (secondsString.length === 1) display += "0";
-        display += secondsString;
-
+				secondsString = secondsString.length === 1 ? "0" + secondsString : secondsString;
+				
         /* Show remaining time in the pages title */
-        $("head title").text(display);
-
-        return display;
+        $("head title").text(minutesString + ":" + secondsString);
+				
+				return {
+					minutes: minutesString,
+					seconds: secondsString
+				};
     });
 
-    self.timestamp = function () {
-        var time = new Date();
-        return ("0" + time.getHours()).slice(-2) + ":" +
-            ("0" + time.getMinutes()).slice(-2) + " (" +
-            self.remainingTime() + "min)";
-    }
+
 
     self.alert = function () {
         self.note("...pomodoro complete!")
-        self.totalPomodorosToday(self.totalPomodorosToday() + 1);
+        self.totalToday(self.totalToday() + 1);
 
         var audioElement = document.getElementById('audiostuff');
         audioElement.play();
@@ -50,27 +100,17 @@ var ViewModel = function (durationInMinutes) {
         audioElement.play();
     }
 
-    self.note = function (noteThis, writeBold) {
-        var $newNote = $("<li></li>").text(self.timestamp() + ": " + noteThis);
-        if (writeBold) {
-            $newNote.css("font-weight", "bold");
-        }
-        else {
-            $newNote.css("font-size", "0.9em");
-            $newNote.css("font-style", "italic");
-        }
-        $(".notes").append($newNote);
+    self.note = function (text) {
+			
+			var newNote = new Note();
+			newNote.text = text;
+			newNote.time = new Date();
+			newNote.duration = 60;
+			
+			self.notes.push(newNote);
     }
-
-    self.writeDownNote = function () {
-        if (self.noteText() !== "") {
-            self.note(self.noteText(), true);
-            self.noteText("");
-        }
-    }
-
     self.runningInterval = function () {
-        if (self.running()) {
+        if (self.runningState() === RUNNING_STATE_RUNS) {
             var remainingSeconds = self.remainingSeconds();
             if (remainingSeconds > 0) {
                 remainingSeconds -= 1;
@@ -86,24 +126,44 @@ var ViewModel = function (durationInMinutes) {
 
     self.startClick = function () {
         if (self.remainingSeconds() > 0) {
-            self.running(true);
+            self.runningState(RUNNING_STATE_RUNS);
 
             self.note("pomodoro running...");
         }
     }
 
     self.stopClick = function () {
-        if (self.running()) {
+        if (self.runningState() === RUNNING_STATE_RUNS) {
             self.note("pomodoro paused.");
-            self.running(false);
+            self.runningState(RUNNING_STATE_PAUSED);
         }
     }
 
     self.resetClick = function () {
         self.note("reset at " + self.remainingTime() + "min");
-        self.running(false);
+        self.runningState(RUNNING_STATE_STOPPED);
         self.remainingSeconds(self.startValue);
     }
+
+
+
+
+		self.handleAddNoteButtonClick = function(note) {
+			if (self.noteText() !== "") {
+				self.note(self.noteText());
+				self.noteText("");
+			}
+		};
+		self.handleEditNoteButtonClick = function(note) {
+			alert('edit');
+		};
+		self.handleRemoveNoteButtonClick = function(note) {
+			if (confirm('Do you really want to delete the note?')) {
+				self.notes.remove(note);
+			}
+		};
+
+
 
     window.setInterval(self.runningInterval, 1000);
 
