@@ -20,13 +20,10 @@ h1 {
 		width: auto;
 	}
 
-	
-
-
-.countdown-timer-options {
-    text-align: center;
+.countdown-timer-settings {
+	margin-top: 25px;
 }
-
+	
 .countdown-timer-buttons {
     text-align: center;
 }
@@ -68,10 +65,6 @@ h1 {
     font-size: 2em;
     width:30%;
     float:left;
-}
-
-.countdown-timer-options {
-	margin-top: 15px;
 }
 
 .note-options {

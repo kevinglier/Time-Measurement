@@ -28,74 +28,10 @@
 
 		<div class="row">
 			<div class="col-md-7">
-				<table class="table table-bordered">
-					<thead class="thead-light">
-						<tr>
-							<th style="width: 12%">Start-Time</th>
-							<th style="width: 12%">Duration</th>
-							<th>Note</th>
-							<th style="width: 1%"></th>
-						</tr>
-					</thead>
-					<tbody data-bind="foreach: notes">
-						<tr>
-							<td data-bind="text: getTimeFormatted()"></th>
-							<td data-bind="text: getDurationFormatted()"></th>
-							<td data-bind="text: getTextFormatted()"></th>
-							<td class="note-options">
-								<button type="button" class="btn btn-sm btn-warning" data-bind="click: $parent.handleEditNoteButtonClick">?</button>
-								<button type="button" class="btn btn-sm btn-danger" data-bind="click: $parent.handleRemoveNoteButtonClick">-</button>
-							</td>
-						</tr>
-					</tbody>
-					<tbody>
-						<tr>
-							<td></td>
-							<td></td>
-							<td><input type="text" data-bind="value: noteText"></td>
-							<td>
-								<button type="button" class="btn btn-sm btn-success" data-bind="click: handleAddNoteButtonClick">+</button>
-							</td>
-						</tr>
-					</tbody>
-				</table>
+				<note-list></note-list>
 			</div>
 			<div class="col-md-5">
-
-				<div class="card box-shadow">
-					<div class="card-header">
-						<h4 class="my-0 font-weight-normal">Start a Timer</h4>
-					</div>
-					<div class="card-body">
-						<div class="countdown-timer-display" data-bind="with: remainingTime">
-							<span data-bind="text: minutes + ':' + seconds"></span>
-						</div>
-
-
-						<div class="countdown-timer-buttons">
-							<button type="button" class="btn btn-lg btn-success" type="button" data-bind="click: startClick, text: runningState() == 2 ? 'Resume' : 'Start'">Start</button>
-							<button type="button" class="btn btn-lg btn-warning" type="button" data-bind="click: stopClick, attr: { disabled: runningState() != 1 }">Pause</button>
-							<button type="button" class="btn btn-lg btn-danger" type="button" data-bind="click: resetClick">Reset</button>
-						</div>
-					</div>
-				</div>
-
-				<div class="card box-shadow countdown-timer-options">
-					<div class="card-header">
-						<h4 class="my-0 font-weight-normal">Settings</h4>
-					</div>
-					<div class="card-body">
-							<div>
-								Time Unit:
-								<select data-bind="foreach: timeUnits, value: timerTimeUnit, disabled: timeUnitsDisabled, attr: { disabled: timeUnitsDisabled }">
-									<option data-bind="text: caption, attr: { value: key, selected: $data == $parents[0].timerTimeUnit() ? '' : null }"></option>
-								</select>
-							</div>
-							<div>
-								<button type="button" class="btn btn-lg btn-default" type="button" data-bind="click: soundTestClick">Sound-Test</button>
-							</div>
-					</div>
-				</div>
+				<timer params="onTimerEnded: timerStopped, onTimerStartedByUser: timerStarted, onTimerStoppedByUser: timerStopped, onTimerPausedByUser: timerPaused, onTimerTick: timerTick"></timer>
 			</div>
 		</div>
 	</div>
@@ -110,9 +46,21 @@
   <script src="vendor/jquery-3.2.1.js"></script>
   <script src="vendor/knockout-3.4.2.js"></script>
 	<script src="vendor/bootstrap-4.0.0.min.js"></script>
+	
+	<script src="js/main.constants.js"></script>
+	
+	<script src="js/note-list.service.js"></script>
+	<script src="js/main.services.js"></script>
+	
+	<script src="js/note-list.component.js"></script>
+	<script src="js/timer.component.js"></script>
+	
+	
+	
   <script src="js/main.js"></script>
+	
   <script>
-    ko.applyBindings(ViewModel(60));
+    ko.applyBindings(ViewModel());
   </script>
 </body>
 
