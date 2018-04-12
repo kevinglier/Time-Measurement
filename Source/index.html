@@ -31,7 +31,24 @@
 				<note-list></note-list>
 			</div>
 			<div class="col-md-5">
-				<timer params="onTimerEnded: timerStopped, onTimerStartedByUser: timerStarted, onTimerStoppedByUser: timerStopped, onTimerPausedByUser: timerPaused, onTimerTick: timerTick"></timer>
+				<div class="card box-shadow countdown-timer-settings">
+					<div class="card-header">
+						<h4 class="my-0 font-weight-normal">Timer</h4>
+					</div>
+					<div class="card-body">
+						<timer params="onTimerEnded: timerStopped, onTimerStartedByUser: timerStarted, onTimerStoppedByUser: timerStopped, onTimerPausedByUser: timerPaused, onTimerTick: timerTick"></timer>
+					</div>
+				</div>
+				<!--
+				<div class="card box-shadow countdown-timer-settings">
+					<div class="card-header">
+						<h4 class="my-0 font-weight-normal">Settings</h4>
+					</div>
+					<div class="card-body">
+						<settings params="settings: settings"></settings>
+					</div>
+				</div>
+				-->
 			</div>
 		</div>
 	</div>
@@ -54,6 +71,9 @@
 	
 	<script src="js/note-list.component.js"></script>
 	<script src="js/timer.component.js"></script>
+	<!--
+	<script src="js/settings.component.js"></script>
+	-->
 	
 	
 	
