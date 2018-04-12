@@ -14,4 +14,4 @@ It contains (checked checkboxes means its really in there, otherwise it is a tod
 ## Preview / Run 
 
  - Link to the web page (original by stho32): https://stho32.github.io/Time-Measurement/Source/index.html
- - Link to the web page (forked by Kevin Glier): https://github.io/kevinglier/Time-Measurement/Source/index.html
+ - Link to the web page (forked by Kevin Glier): https://kevinglier.github.io/Time-Measurement/Source/index.html
